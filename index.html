@@ -1,61 +1,103 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- AFRAME + MINDAR -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+
+    <!-- Outfit font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&display=swap" rel="stylesheet">
+
     <style>
-  #red-box {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(to bottom, #ff4d4d, #cc0000);
-    color: white;
-    padding: 14px 28px;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    box-shadow: 0 6px #990000;
-    cursor: pointer;
-    display: none; /* Hidden initially */
-    z-index: 999;
-    transition: all 0.2s ease;
-  }
+      /* BOTTOM BUTTON CONTAINER */
+      #bottom-controls {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 20px;
+        z-index: 9999;
+      }
 
-  #red-box:hover {
-    background: linear-gradient(to bottom, #ff6666, #cc0000);
-    box-shadow: 0 4px #990000;
-    transform: translate(-50%, 2px);
-  }
+      /* 🔊 AUDIO BUTTON - black squircle */
+      #audioBtn {
+        background: black;
+        color: white;
+        width: 75px;
+        height: 75px;
+        border-radius: 22px;
+        font-size: 32px;
+        border: none;
+        line-height: 75px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+      }
 
-  #red-box:active {
-    box-shadow: 0 2px #990000;
-    transform: translate(-50%, 4px);
-  }
-</style>
+      /* 🔴 CLICK FOR MORE button – darker red */
+      #red-box {
+        background: #b00000; /* darker red */
+        color: white;
+        padding: 14px 28px;
+        font-family: 'Outfit', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 6px #700000;
+        cursor: pointer;
+        display: none;
+        transition: 0.2s;
+      }
+
+      #red-box:hover {
+        background: #c10000;
+        box-shadow: 0 4px #700000;
+        transform: translateY(2px);
+      }
+
+      #red-box:active {
+        background: #8a0000;
+        box-shadow: 0 2px #700000;
+        transform: translateY(4px);
+      }
+    </style>
 
   </head>
-  <body>
-    <div id="red-box">CLICK FOR MORE</div>
 
-    <a-scene mindar-image="imageTargetSrc: targets/card.mind;" 
-             color-space="sRGB" 
-             renderer="colorManagement: true, physicallyCorrectLights" 
-             vr-mode-ui="enabled: false" 
-             device-orientation-permission-ui="enabled: false">
+  <body>
+
+    <!-- BOTTOM CONTROL BAR -->
+    <div id="bottom-controls">
+      <button id="audioBtn">🔊</button>
+      <button id="red-box">CLICK FOR MORE</button>
+    </div>
+
+    <a-scene
+      mindar-image="imageTargetSrc: targets/card.mind;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled:false"
+      device-orientation-permission-ui="enabled:false">
 
       <a-assets>
         <img id="card" src="targets/card.png" />
         <a-asset-item id="avatarModel" src="assets/scene.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-        <a-plane src="#card" position="0 0 0" height="0.552" width="1" rotation="0 0 0" material="opacity: 0; transparent: true"></a-plane>
+        <a-plane src="#card"
+                 position="0 0 0"
+                 height="0.552"
+                 width="1"
+                 rotation="0 0 0"
+                 material="opacity:0; transparent:true">
+        </a-plane>
 
         <a-gltf-model id="avatar"
                       rotation="90 0 0"
@@ -65,21 +107,35 @@
                       animation-mixer>
         </a-gltf-model>
       </a-entity>
+
     </a-scene>
 
     <script>
       const redBox = document.getElementById("red-box");
-      const target = document.querySelector("#target-entity");
+      const target = document.getElementById("target-entity");
+      const audioBtn = document.getElementById("audioBtn");
 
+      /* ▶ ANIMATION TRIGGER */
       target.addEventListener("targetFound", () => {
         setTimeout(() => {
-          redBox.style.display = "block"; // Show the red box after 5s
+          redBox.style.display = "block";
         }, 5000);
       });
 
+      /* 🔗 LINK */
       redBox.addEventListener("click", () => {
-        window.open("https://www.grandroyaltours.in/", "_blank"); // Replace with your actual link
+        window.open("https://www.grandroyaltours.in/", "_blank");
+      });
+
+      /* 🔊 AUDIO PLAYBACK */
+      const voice = new Audio("assets/voice.mp3");
+      voice.preload = "auto";
+
+      audioBtn.addEventListener("click", () => {
+        voice.currentTime = 0;
+        voice.play();
       });
     </script>
+
   </body>
 </html>
