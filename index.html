@@ -40,7 +40,6 @@
         text-align: center;
         cursor: pointer;
         box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-        z-index: 999999999 !important;
       }
 
       #red-box {
@@ -56,7 +55,6 @@
         cursor: pointer;
         display: none;
         transition: 0.2s;
-        z-index: 999999999 !important;
       }
 
       #red-box:hover {
@@ -69,6 +67,16 @@
 
   <body>
 
+    <!-- Unlock iPhone device orientation + camera -->
+    <script>
+      document.body.addEventListener("click", () => {
+        if (typeof DeviceMotionEvent !== "undefined" &&
+            typeof DeviceMotionEvent.requestPermission === "function") {
+          DeviceMotionEvent.requestPermission().catch(() => {});
+        }
+      });
+    </script>
+
     <!-- MOBILE-SAFE AUDIO ELEMENT -->
     <audio id="voice" src="assets/voice.mp3" preload="auto"></audio>
 
@@ -78,12 +86,13 @@
       <button id="red-box">CLICK FOR MORE</button>
     </div>
 
+    <!-- CAMERA PERMISSION FIX APPLIED HERE -->
     <a-scene
       mindar-image="imageTargetSrc: targets/card.mind;"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
-      vr-mode-ui="enabled:false"
-      device-orientation-permission-ui="enabled:false">
+      vr-mode-ui="enabled:true"
+      device-orientation-permission-ui="enabled:true">
 
       <a-assets>
         <img id="card" src="targets/card.png" />
@@ -127,7 +136,7 @@
       });
 
       target.addEventListener("targetLost", () => {
-        // Let MindAR freeze automatically
+        // Freeze by MindAR default
       });
 
       /* CLICK FOR MORE */
