@@ -11,7 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&display=swap" rel="stylesheet">
 
     <style>
-      /* BOTTOM BUTTON CONTAINER */
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+
+      /* Make sure UI is ALWAYS visible on mobile */
       #bottom-controls {
         position: absolute;
         bottom: 20px;
@@ -19,10 +24,10 @@
         transform: translateX(-50%);
         display: flex;
         gap: 20px;
-        z-index: 9999;
+        z-index: 999999999 !important;
+        pointer-events: auto !important;
       }
 
-      /* 🔊 AUDIO BUTTON - black squircle */
       #audioBtn {
         background: black;
         color: white;
@@ -35,11 +40,11 @@
         text-align: center;
         cursor: pointer;
         box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        z-index: 999999999 !important;
       }
 
-      /* 🔴 CLICK FOR MORE button – darker red */
       #red-box {
-        background: #b00000; /* darker red */
+        background: #b00000;
         color: white;
         padding: 14px 28px;
         font-family: 'Outfit', sans-serif;
@@ -51,6 +56,7 @@
         cursor: pointer;
         display: none;
         transition: 0.2s;
+        z-index: 999999999 !important;
       }
 
       #red-box:hover {
@@ -58,17 +64,13 @@
         box-shadow: 0 4px #700000;
         transform: translateY(2px);
       }
-
-      #red-box:active {
-        background: #8a0000;
-        box-shadow: 0 2px #700000;
-        transform: translateY(4px);
-      }
     </style>
-
   </head>
 
   <body>
+
+    <!-- MOBILE-SAFE AUDIO ELEMENT -->
+    <audio id="voice" src="assets/voice.mp3" preload="auto"></audio>
 
     <!-- BOTTOM CONTROL BAR -->
     <div id="bottom-controls">
@@ -88,17 +90,10 @@
         <a-asset-item id="avatarModel" src="assets/scene.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+      <a-camera look-controls="enabled:false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-        <a-plane src="#card"
-                 position="0 0 0"
-                 height="0.552"
-                 width="1"
-                 rotation="0 0 0"
-                 material="opacity:0; transparent:true">
-        </a-plane>
-
+        
         <a-gltf-model id="avatar"
                       rotation="90 0 0"
                       position="0 0 0.075"
@@ -106,31 +101,41 @@
                       src="#avatarModel"
                       animation-mixer>
         </a-gltf-model>
+
       </a-entity>
 
     </a-scene>
 
     <script>
       const redBox = document.getElementById("red-box");
-      const target = document.getElementById("target-entity");
       const audioBtn = document.getElementById("audioBtn");
+      const voice = document.getElementById("voice");
 
-      /* ▶ ANIMATION TRIGGER */
+      const target = document.getElementById("target-entity");
+      const avatar = document.getElementById("avatar");
+
+      /* SHOW RED BOX AFTER FOUND */
       target.addEventListener("targetFound", () => {
         setTimeout(() => {
           redBox.style.display = "block";
         }, 5000);
+
+        if (avatar.components["animation-mixer"]) {
+          avatar.components["animation-mixer"].stopAction();
+          avatar.components["animation-mixer"].playAction();
+        }
       });
 
-      /* 🔗 LINK */
+      target.addEventListener("targetLost", () => {
+        // Let MindAR freeze automatically
+      });
+
+      /* CLICK FOR MORE */
       redBox.addEventListener("click", () => {
         window.open("https://www.grandroyaltours.in/", "_blank");
       });
 
-      /* 🔊 AUDIO PLAYBACK */
-      const voice = new Audio("assets/voice.mp3");
-      voice.preload = "auto";
-
+      /* AUDIO BUTTON CLICK */
       audioBtn.addEventListener("click", () => {
         voice.currentTime = 0;
         voice.play();
